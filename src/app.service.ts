@@ -13,9 +13,10 @@ export class AppService {
     const data = await getCurrentData(ticker);
     return data as Ticker;
   }
-  async getCriptoTicker(ticker: string): Promise<any> {
+
+  async getCriptoTicker(ticker: string): Promise<Ticker> {
     const binance = new ccxt.binance();
     const data = await binance.fetchTicker(ticker);
-    return { ticker, price: data['average'] };
+    return { currency: ticker, price: data['average'] };
   }
 }

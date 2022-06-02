@@ -1,6 +1,17 @@
-import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { AppService } from './app.service';
+import { Directus } from '@directus/sdk';
+const directus = new Directus('http://localhost:8055');
 
 @Controller()
 export class AppController {
@@ -29,6 +40,37 @@ export class AppController {
       });
     } catch (err) {
       return res.status(HttpStatus.BAD_REQUEST).json({ msg: err.message });
+    }
+  }
+
+  @Post('login')
+  async doLogin(
+    @Body() body: { user: string; pass: string },
+    @Res() res: Response,
+  ) {
+    try {
+      const call: any = await directus.auth.login({
+        email: body.user,
+        password: body.pass,
+      });
+      return res.status(HttpStatus.OK).json(call);
+    } catch (err) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ msg: err.message });
+    }
+  }
+
+  @Post('logout')
+  async doLogout(
+    @Body() body: { refresh_token: string },
+    @Res() res: Response,
+  ) {
+    try {
+      const call = await this.appService.directusLogout('asdasdasd');
+      return res.status(HttpStatus.OK).json(call.data);
+    } catch (err) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ msg: err.response.data });
     }
   }
 }
